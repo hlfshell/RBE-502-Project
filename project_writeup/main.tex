@@ -19,71 +19,39 @@
 %\usepackage[parfill]{parskip}. %to not indent paragraph
 \renewcommand\refname{References}
 \restylefloat{table}
-\begin{document}
-\begin{titlepage}
-   \begin{center}
-       \vspace*{1cm}
-        \Huge
-       \textbf{LQR control of a Nonlinear Quadrotor System}
-        \Large
-        
-       \vspace{0.5cm}
-        Project Group F
-            
-       \vspace{1.5cm}
 
-       \textbf{Keith Chester, Bob DeMont, Sean Hart}
-\begin{figure}[H]
+
+\title{LQR Control of a Nonlinear Quadrotor System}
+\author{Keith Chester, Bob DeMont, Sean Hart}
+\date{November 9th, 2021}
+
+\begin{document}
+
+\maketitle
+
+\begin{figure}[h]
     \centering
-    \includegraphics[width =1\textwidth]{images/ProjProbStmt.png}
-     \label{fig:prob}
+    \includegraphics[width =0.75\textwidth]{images/ProjProbStmt.png}
+    \label{fig:prob}
 \end{figure}
 
-
-       \vfill
-            
-       A paper presented for the class of\\
-       Robot Motion - RBE 502
-            
-       \vspace{0.8cm}
-     
-       %\includegraphics[width=0.4\textwidth]{university}
-            
-       Robotics Engineering\\
-       Worcester Polytechnic Institute\\
-       United States of America\\
-       November 9, 2021
-            
-   \end{center}
-\end{titlepage}
+\begin{multicols}{2}
 
 
-%\begin{multicols}{ 2}
 \section*{Abstract}
 
-The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals.  The first is to have the quadrotor hover in a stable configuration.  The second goal is to introduce a drone in flight and to have the quadrotor intercept that flight without knowing it's path.  The third goal is to simulate the capture of the drone with a randomized disturbance force and maintain stable flight while returning to base.
+The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals: simulate and control the quadrotor hover in a stable configuration, chase an interloping quadrotor in flight and intercept, and return with the captured target quadrotor with randomized disturbance force while maintaining stable flight.
 
 \section*{Situation/Problem}
-The mission is defense of a designated airspace.  Our quadrotor is assigned to 
-monitor a limited airspace, launch if an unidentified UAV enters that airspace, capture 
-the bogey and return to base without leaving the airspace.  If the bogey leaves the 
-airspace before being captured, our quadrotor should return to base.  When captured 
-the bogey should be assumed to generate external forces on our UAV. The figure on 
-the title page depicts the scenario.
+The mission is defense of a designated airspace.  Our quadrotor is assigned to monitor a limited airspace, launch if an unidentified UAV enters that airspace, capture the target, and return to base.  If the target leaves the airspace before being captured, our quadrotor should return to base.  When captured, the target should be assumed to generate external forces on our UAV. The figure on the title page depicts the scenario.
+
+
 \section*{Setup}
 
-\noindent Coordinate frames are identified for the reference/inertial frame $E={e_1, e_2, e_3}$ at the center bottom of the airspace and the body frame $C={c_1, c_2, c_3}$.  All rotors are equidistant from the center of mass and in the same $c_1-c_2 $ plane as the body center of mass.  The external forces and moments on the system are represented by $\boldsymbol{r}$ and $\boldsymbol{n}$, where $\boldsymbol{r} = r_1 c_1 + r_2 c_2 + r_3 c_3$ and $\boldsymbol{n} = n_1 c_1 + n_2 c_2 + n_3 c_3$ directly applied to the center of mass. We are assuming that the torque of the rotor is proportionaly related to the input thrust via the constant $\sigma>0$, for $\tau_i = \sigma u_i$. We will be utilizing $\boldsymbol{I}$ as our diagonal inertial matrix where diagonal elements
-%\begin{equation}
-%    \boldsymbol{I} = 
- %   \begin{bmatrix}
- %       I_x & 0 & 0 \\
- %      0 & I_y & 0 \\
-%        0 & 0 & I_z 
-%    \end{bmatrix}
-%\end{equation}
- $I_x, I_y $ and $I_z$ represent the mass moments of inertia about $c_1, c_2 $ and $c_3$ respectively.  For the purpose of our analysis we'll ignore the $\bf{(drag fdkgjeflgjwelkfjg)}$
-\noindent The following are given as the quadrotor parameters and environmental constants:
-\begin{table}[H] %[bp]
+\noindent Coordinate frames are identified for the reference/inertial frame $E={e_1, e_2, e_3}$ at the center bottom of the airspace and the body frame $C={c_1, c_2, c_3}$.  All rotors are equidistant from the center of mass and in the same $c_1-c_2 $ plane as the body center of mass.  The external forces and moments on the system are represented by $\boldsymbol{r}$ and $\boldsymbol{n}$, where $\boldsymbol{r} = r_1 c_1 + r_2 c_2 + r_3 c_3$ and $\boldsymbol{n} = n_1 c_1 + n_2 c_2 + n_3 c_3$ directly applied to the center of mass. We are assuming that the torque of the rotor is proportionaly related to the input thrust via the constant $\sigma>0$, for $\tau_i = \sigma u_i$. We will be utilizing $\boldsymbol{I}$ as our diagonal inertial matrix where diagonal elements  $I_x, I_y $ and $I_z$ represent the mass moments of inertia about $c_1, c_2 $ and $c_3$ respectively.  For the purpose of our analysis we'll ignore the drag. The parameters for our state are described in table $\ref{table:Qparams}$.
+
+
+\begin{table*}[t] %[bp]
 \begin{centering}
 \begin{tabular}{|cccc|}
 \hline
@@ -99,23 +67,32 @@ $\sigma\ $& .01 & m & Proportionality constant relating $u_i $ to $\tau_i$\\
 \hline
 \end{tabular}
 \caption{Quadrotor Parameters}
-\label{tab:Qparams}
+\label{table:Qparams}
 \end{centering}
-\end{table}
+\end{table*}
+
+
 \section*{General Approach}
 We'll begin by generating the state space variables and defining the state space.  We'll prove controllability of the system and choose a controller methodology.  Using the controller, we will simulate hover as well as move to location and hover.  Finally we'll introduce external forces and moments that would be experienced simulating a target capture in the problem statement.  For ease of variable passing, our quadcopter will be represented as a structure in Matlab, with full state variables, A and B matrices, K gain matrix, $K_{capture}$ gain matrix (incorporating $n$ and $r$ forces and torques from the target) as well as characteristics for graphing (colors etc).
 
 \section*{Methods}
 We'll establish the state variable, $\mathbf{z}$ to represent the quadrotor's xyz center-of-mass position in the earth 
-frame $\mathbf{x}=[x_1, x_2, x_3]$; the roll, pitch, yaw angles in the earth frame, $\bm{\alpha}=[\phi,\theta\psi]$; the xyz linear
- velocities in the earth frame, $\mathbf{v}=[v_1, v_2, v_3]$; and the angular accelerations $\bm{\omega}=[\omega_1, \omega_2, \omega_3]$ in the earth roll pitch yaw directions. Our state variable then is $\mathbf{z}=[\mathbf{x},\bm{\alpha},\mathbf{v},\bm{\omega}]^T$ and our state space is defined as:
+frame $\mathbf{x}=[x_1, x_2, x_3]$; the roll, pitch, yaw angles in the earth frame, $\bm{\alpha}=[\phi,\theta\psi]$; the xyz linear velocities in the earth frame, $\mathbf{v}=[v_1, v_2, v_3]$; and the angular accelerations $\bm{\omega}=[\omega_1, \omega_2, \omega_3]$ in the earth roll pitch yaw directions. Our state variable then is $\mathbf{z}=[\mathbf{x},\bm{\alpha},\mathbf{v},\bm{\omega}]^T$ and our state space is defined as:
+
+\begin{equation}
+    \mathbf{\dot{x}} =\mathbf{v}
+\end{equation}
+\begin{equation}
+    \bm{\dot{\alpha}} =\mathbf{T}^{-1}\bm{\omega}
+\end{equation}
 \begin{align}
-\mathbf{\dot{x}}&=\mathbf{v} \\
-\bm{\dot{\alpha}}&=\mathbf{T}^{-1}\bm{\omega} \\
-\mathbf{\dot{v}}&=-ge_3+\frac{1}{m}\mathbf{R_{C/E}}(u_1+u_2+u_3+u_4)c_3+\frac{1}{m}\mathbf{R_{C/E}}r \\
-\bm{\dot{\omega}}&=I^{-1}((u_2-u_4)lc_1+(u_3-u_1)lc_2+(u_1-u_2+u_3-u_4)\sigma c_3+n-\omega \times I \omega)
+    \mathbf{\dot{v}} =-ge_3+\frac{1}{m}\mathbf{R_{C/E}}(u_1+u_2+u_3+u_4)c_3 \nonumber\\ +\frac{1}{m}\mathbf{R_{C/E}}r
 \end{align}
-\noindent Where $\mathbf{R_{C/E}}$ is defined in the problem statement as the Euler rotation matrix from quadrotor frame $C$ to earth frame $E$ and $\mathbf{T}^{-1}$, also defined in the problem statement, relates the angular rate of change of the Euler angles based on the angular velocity of the quadrotor.
+\begin{align}
+    \bm{\dot{\omega}} =I^{-1}((u_2-u_4)lc_1+(u_3-u_1)lc_2 \nonumber\\ +(u_1-u_2+u_3-u_4)\sigma c_3+n-\omega \times I \omega)
+\end{align}
+
+\noindent ...where $\mathbf{R_{C/E}}$ is defined in the problem statement as the Euler rotation matrix from quadrotor frame $C$ to earth frame $E$ and $\mathbf{T}^{-1}$, also defined in the problem statement, relates the angular rate of change of the Euler angles based on the angular velocity of the quadrotor.
 %Equation development commented out
 %\begin{equation}
 %    \mathbf{R_{C/E}}=
@@ -134,8 +111,8 @@ frame $\mathbf{x}=[x_1, x_2, x_3]$; the roll, pitch, yaw angles in the earth fra
   %  \end{bmatrix}
 %\end{equation}
 
-Our system is nonlinear because it is under-actuated (4 actuators for 6 degrees of freedom) but we can approximate it's behavior linearly around a point (linear approximation).  We'll use this to derive our $\bf(K)$ matrix to determine our control.  We desire to get it into the linear format $\dot{x} = Ax + Bu$.
-\noindent For a linearization in the neighborhood of a desired state space we'll define error $ e :=  z_d-z $ and change in inputs $ w :=  u_d-u $:
+Our system is nonlinear because it is under-actuated; four actuators for six degrees of freedom. We can approximate its behavior using linear approximation.  We can then derive  our $\boldsymbol{K}$ matrix to determine our control.  We desire to get it into the linear format $\dot{x} = Ax + Bu$.
+\noindent For a linearization in the neighborhood of a desired state space we'll define error $ e :=  z_d-z $ and change our inputs to $ w :=  u_d-u $.
 With $u_d$ being the input to obtain the desired  state variable $z_d $.  We obtain the linearization through Taylor series expansion around the desired $(z_d,u_d)$
 
 %which is generally 
@@ -203,10 +180,13 @@ Taking the derivative of our error function $\dot{e}=\dot{z}_d-\dot{z}$ and subs
 %\end{gather}
 allows us to obtain our \textbf{linear approximation of the system}  in the error dynamic written in the form $ \dot{e}=Ae+Bw$.
 In order to make certain that our system is \emph{controllable}, we must ensure that the combinations of our state and input matrices are linearly independent to the degree that we have an independent column for each state.  To do so, we check rank of the controllability matrix assure that we have rank equal to the number of states in our z vector.  The controllability matrix is defined as:
+
 \begin{equation}
-C = [B | AB | A^2B | A^3B | ... | A^{10}B | A^{11}B]
+C = \begin{bmatrix} B & AB & A^2B & A^3B & \dots & A^{10}B & A^{11}B\end{bmatrix}
 \end{equation}
-\noindent Indeed Matlab confirms our system is of rank 12  so the \textbf{system is controllable}. We can use the error dynamic equation$\dot{e} = (A - BK)e$  to determine the closed loop gain matrix K.
+
+\noindent When we find the rank of our $C$ matrix, we find that the rank is as expected - 12. This confirms that the \textbf{system is controllable}. We can use the error dynamic equation$\dot{e} = (A - BK)e$  to determine the closed loop gain matrix K.
+
 \section*{LQR Controller}
 We selected the Linear-Quadratic Regulator (LQR) approach as an optimal control technique for generating the gain matrix, K.  LQR operates on the linearized system above utilizing both A matrix (states) and B matrix (inputs), and adds two matrices, Q and R which correspond to A and B and whose purpose is to impose a cost so the algorithm may trade off between the state and the actuators in the optimization.  Since we are not asked to weigh the cost of using the actuators (as if we were conserving fuel) , we have left the R matrix as a diagonal matrix of ones.  We have also not yet weighed the Q matrix, leaving it too as a matrix of diagonal ones, so that we may experiment in the future what is the best way to prioritize states in the system.  N is an interaction penalty matrix which will be assumed to not be relevant for this analysis.
 \noindent
@@ -311,6 +291,6 @@ Matlab Tech Talks. 2019, February 5. Optimal Control LQR. YouTube. https://www.y
 
 \end{thebibliography}
 
-%\end{multicols}
+\end{multicols}
 
 \end{document}
