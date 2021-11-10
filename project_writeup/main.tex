@@ -180,13 +180,18 @@ K = R^{-1}(B^TP(t) + N^T)
 \end{equation}
 \noindent
 Where P is created by solving Ricatti's continuous time differential equation:
-\begin{equation}
-A^TP(t) + P(t)A - (P(t)B + N)R^{-1}(B^TP(t) + N^T) + Q = \dot{P(t)}
-\end{equation}
+\begin{align}
+A^TP(t) + P(t)A - (P(t)B + N)R^{-1}(B^TP(t) + N^T) \nonumber\\+ Q = \dot{P}(t)
+\end{align}
 \noindent
-and P(t) is bounded by $P(0) = F(0)$\\
+and $P(t)$ is bounded by $P(0) = F(0)$. This process is repeated as we experimented with adjusting the weights within the $\boldsymbol{Q}$ matrix.
 
-\bigskip
+Once we have our calculated $\boldsymbol{K}$, we define $z_d$ as the desired state of our quadrotor. If we are hovering at sending our quadrotor given point in space ($x_d$, $y_d$, and $z_d$), it will be $z_d=\begin{bmatrix} x_d & y_d & z_d & \boldsymbol{0} \end{bmatrix}^T$. When we are chasing a given target through protected airspace, we will set the desired state to $z_d(t)=\begin{bmatrix} x_t(t) \boldsymbol{0} \end{bmatrix}^T$ where $x_t(t)$ is the $x_t$, $y_t$, and $z_t$ of the target at a given time $t$. We then calculate the error $e(t)$ as the difference between our desired state, or $z_d - z$. We utilize the error to determine the resulting inputs to our system, but we also must take note that since we assumed a linearized system around hovering, we must add an additional force of $\frac{mg}{4}$ to each of our input forces. Thus $\boldsymbol{u}= \boldsymbol{K}e(t) + \begin{bmatrix}\frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4}\end{bmatrix}$. 
+
+Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u \epsilon (0, 3)$ as that is the max and minimum forces out motors can generate.
+
+We then utilized the MATLAB $\textit{ode45}$ solver, utilizing our previously derived $\boldsymbol{\dot{z}}$ with calculated $\boldsymbol{u}$. At each stage we determine what state of behaviour we desired from our quadrotor - hover, move, and intercept - and from this determine the $z_d$. Solving the $\boldsymbol{\dot{z}}$ ???
+
 \section*{Modelling}
 
 \noindent
