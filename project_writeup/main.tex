@@ -142,7 +142,7 @@ and from this determine the $z_d$. We then solve for our state variable $\boldsy
 \noindent
 The foundation of simulating the controller is the solution of the system of differential equations of our original system with the added 
 gain from our LQR controller.  We have wrapped the changes in the environment into a separate function to serve as the ODE 
-function in order to incorporate time-related changes to the target path as well as n and r forces and torques after capture.\\
+function in order to incorporate time-related changes to the target path as well as $n$ and $r$ torques and forces after capture.\\
 \textbf{Quadrotor Hovering.}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]$ and 
 a desired state $z_d=[5,5,5,0,0,0,0,0,0,0,0,0] $ to demonstrate move and hover.  Feeding these into our ODE45 solver, we obtain 
 smooth movement and hovering at the given $z_d$.  (Note initial and final states as well as trajectory plotted) in Figure 1a.\\
@@ -153,33 +153,41 @@ the airspace envelope before the interceptor gets close enough to capture.\\
 include it in a single differentiation.  In earlier iterations, we coded random, continuous movements into the target which were only 
 revealed to our quadcopter each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solve time.
 For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it.   Our simulation demonstrates 
-successful interception of the target after tuning the Q matrix to de-emphasize errors in the z direction (to enable smoother up/down 
+successful interception of the target after tuning the Q matrix to de-emphasize errors 
+in the z direction (to enable smoother up/down 
 movement) and penalize x-y errors.  \\
-\textbf{Capture Drone and Return to Base  with Disturbances}.  For the disturbance forces and torques after capture,  in the control of the ODE function we trigger a change in $n$ and $r$ and re-evaluate K  to recalculate the control, $u$, term for the ODE.  Again we use the simplification of a time dependent function for the $n$ term $n=[\sin(t)/2; 0; 0]$ to simulate the target trying to escape.  Other $n$ vectors were also simulated.\\
+\textbf{Capture Drone and Return to Base  with Disturbances}.  For the disturbance 
+forces and torques after capture,  in the control of the ODE function we trigger a 
+change in $n$ and $r$ and re-evaluate K  to recalculate the control, $u$, term for the 
+ODE.  Mission parameters asked to reach an $||n||<=1$ (moment) and $||r||<=2$(force)
+We began by testing constant moments and forces in each direction before mixing or 
+randomizing since the system must, at a minimum, handle a constant force of the 
+required magnitude before being able to deal with a time-dependent randomized 
+force.
 \begin{figure}[H]
 \centering
-\begin{subfigure}[b]{0.45\columnwidth}
+\begin{subfigure}[b]{0.49\columnwidth}
     \centering
     \includegraphics[width = 1\textwidth]{images/MoveAndHover.png}
      \label{fig:MandH}
      \vspace{-5mm}
      \caption{Move and Hover}
 \end{subfigure}
-\begin{subfigure}[b]{0.45\columnwidth}
+\begin{subfigure}[b]{0.49\columnwidth}
     \centering
     \includegraphics[width = 1\textwidth]{images/ReturnToBase.png}
      \label{fig:Return}
      \vspace{-5mm}
       \caption{Return to Base}
  \end{subfigure}
-\begin{subfigure}[b]{0.45\columnwidth}
+\begin{subfigure}[b]{0.49\columnwidth}
     \centering
     \includegraphics[width = 1\textwidth]{images/Intercept.png}
      \label{fig:Capture}
      \vspace{-5mm}
      \caption{Capture}
  \end{subfigure}
- \begin{subfigure}[b]{0.45\columnwidth}
+ \begin{subfigure}[b]{0.49\columnwidth}
     \centering
     \includegraphics[width = 1\textwidth]{images/Intercept.png}
      \label{fig:CaptureW}
@@ -190,9 +198,86 @@ movement) and penalize x-y errors.  \\
 \end{figure}
 
 \section*{Results}
-We were unable to successfully return to base with a captured target given the limits (but this may not be the case if we fix A and B)?
+As noted above, the LQR controller successfully handled move and hover, return to base and intercept missions.  We encountered less successful results with the disturbances after capture.\\
+\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q(4,4)$ term for roll would be impacted.  At 
+$Q(4,4)=1$ and $n=(1,0,0)$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle.  
+Because of the tumbling we hypothesized that near level flight i.e. preventing roll and pitch from exceeding $pi/4$, would benefit control 
+especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing 
+$Q(4,4)$ and $Q(5,5)$ to 10 allowed the system to converge but not at the "nest"; but rather at $[x,y,z]=[10.8,.023,.30]$.  We progressively 
+increased $n=(n_1,0,0)$ for $n_1<=2$ to attempt to meet mission parameters.  None can return to  $[x,y,z]=[0,0,0] $but some find stable solutions.  
+\begin{figure}[H]
+\centering
+    \includegraphics[width = 1\columnwidth]{images/RollPitch.png}
+     \label{fig:Horizon}
+     \caption{Q as Function of n in x}
+\end{figure}
+Figure \ref{Horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $n=(-n_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $n_2$ direction result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.\\
+
+\begin{table}[H] %[bp]
+\begin{centering}
+\begin{tabular}{|cccc|}
+\hline
+r & Q(3,4/5) & $z_{1-6}$   \\
+\hline
+ $[2,0,0]$&[1,1400]&[50.3,-0.2,1.5,0,-0.8,-0.6]\\
+ $[-2,0,0]$&[1,1400]&[-50.0, 0.4. 3.3,0,1.0,0.1]\\
+ $[0,2,0]$&[1,1400]&[-0.5, 50.0, 1.5,0.9,0,-0.2,]\\
+ $[0,-2,0]$&[1,1400]&[0.6, -50.0,3.3,-0.9,0,-0.3]\\ 
+\hline
+\end{tabular}
+\caption{State Variables from Constant Forces}
+\label{tab:STFCF1}
+\end{centering}
+\end{table}
+Convergences under forces in the $n_3$ direction benefit from strong Q(4,4) and Q(5,5) but can have far lower penalties before not converging.  Note in Table \ref{STFCF2} the closeness to the nest in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q(4,4)=Q(5,5)=145$.
+\begin{table}[H] %[bp]
+\begin{centering}
+\begin{tabular}{|cccc|}
+\hline
+r & Q(3,4/5) & $z_{1-6}$   \\
+\hline
+ $[0,0,2]$&[1,1400]&[0.0, 0.0, 2.8,0,0,0]\\
+ $[0,0,2]$&[1,1000]&[0.0, 0.0, 2.8,0,0,0]\\
+$[0,0,2]$&[1,150]&[0.0, 0.0, 2.8,0,0,0.1]\\
+$[0,0,2]$&[1,147]&[0.02, 0.01, 2.9,0,0,0.1]\\
+$[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
+ \hline
+\end{tabular}
+\caption{State Variables from Constant Forces}
+\label{tab:STFCF2}
+\end{centering}
+\end{table}
+\textbf{Moments}.  Similar to the above, we examined constant moments in each of the 3 directions.  At $n_1=.5$ (half mission parameter) we found near-convergence in the neighborhood of Q94,4)/(5,5)=950 with slight upward drift ($v_z>0$).  At $n_1=.5$ we could achieve convergence of the equations with $Q(4,4/(5,5)=1200$, but again not at the desire state.  Beyond, $n_1=.51$ it was increasingly not possible to converge on any state.  With $n_2$, the convergence horizon at $Q(4,4)=Q(5,5)=1200$ is between $.4875<n_2<.4885$.  Surprising to the team, the most sensitive was variation in $n_3$ where the convergence horizon for $Q(4,4)=Q(5,5)=Q(6,6)=1000$ is between $.0445<n_3<.045$, an order of magnitude smaller.
+Thus it is impossible to meet mission parameters with both  $||n||<=1$ and $||r||<=2$, though it may be possible with only $r<2$.  Attempting this with a random, time dependent force at $Q(4,4)/(5,5)=1400$, results in no convergence.  Though it gets close at times, the continued forces prevent velocity from converging enough for "shut down" as seen in Figure \ref{Randr}.
+\begin{figure}[H]
+\centering
+\begin{subfigure}[b]{0.49\columnwidth}
+    \centering
+    \includegraphics[width = 1\textwidth]{images/PosnRandom.png}
+     \label{fig:PosRand}
+     \vspace{-5mm}
+     \caption{Positions}
+\end{subfigure}
+\begin{subfigure}[b]{0.49\columnwidth}
+    \centering
+    \includegraphics[width = 1\textwidth]{images/VelocityRandom.png}
+     \label{fig:VRandom}
+     \vspace{-5mm}
+      \caption{Velocities}
+ \end{subfigure}\\
+ \bigskip
+\begin{subfigure}[b]{1.0\columnwidth}
+    \centering
+    \includegraphics[width = 1\textwidth]{images/InterceptRandom.png}
+     \label{fig:RandTraj}
+     \vspace{-5mm}
+     \caption{Trajectory}
+ \end{subfigure}
+    \caption{Random r Performance Tests}
+     \label{fig:Randr}
+\end{figure}
 \section*{Discussion}
-Further research would tune the Q and R matrices.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}.  We could also enhance the process to store target position to estimate the target velocity vector to anticipate next target position.  This could improve time to intercept and allow use of Q weightings for velocity components. More advanced analysis could include power analysis to improve battery life of the quadrotor to extend mission life.
+Further research would tune the Q and R matrices more closely.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}.  We could also enhance the process to store target position to estimate the target velocity vector to anticipate next target position.  This could improve time to intercept and allow use of Q weightings for velocity components. More advanced analysis could include power analysis to improve battery life of the quadrotor to extend mission life.  
 \label{References}
 \bibliographystyle{abbrv}
 \begin{thebibliography}{10}
