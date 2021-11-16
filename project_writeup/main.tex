@@ -51,18 +51,11 @@ body frame $C={c_1, c_2, c_3}$.  All rotors are equidistant from the center of m
 center of mass.  The external forces and moments on the system are represented by $\boldsymbol{r}$ and $\boldsymbol{n}$, where 
 $\boldsymbol{r} = r_1 c_1 + r_2 c_2 + r_3 c_3$ and $\boldsymbol{n} = n_1 c_1 + n_2 c_2 + n_3 c_3$ directly applied to the center 
 of mass. We are assuming that the torque of the rotor is proportionally related to the input thrust via the constant $\sigma>0$, for $
-\tau_i = \sigma u_i$. We will be utilizing $\boldsymbol{I}$ as our diagonal inertial matrix where diagonal elements  $I_x, I_y $ and 
-$I_z$ represent the mass moments of inertia about $c_1, c_2 $ and $c_3$ respectively.  For the purpose of our analysis assume simplified aerodynamic effects and ignore 
- drag, ground effects, translational lift, blade flapping, feathering and lagging and other aerodynamic complexities. The parameters for our state are described in Table 1 of \cite{FaalP}\\
+\tau_i = \sigma u_i$. We will be utilizing $\boldsymbol{I}$ as our diagonal inertial matrix where diagonal elements  $I_x, I_y $, and 
+$I_z$ represent the mass moments of inertia about $c_1, c_2 $, and $c_3$ respectively.  For the purpose of our analysis assume simplified aerodynamic effects and ignore 
+ drag, ground effects, translational lift, blade flapping, feathering, and lagging and other aerodynamic complexities. The parameters for our state are described in Table 1 of \cite{FaalP}\\
 
-\noindent \textbf{State Variable}.  Up to the state variable, development of the quadrotor equations are found in \cite{FaalD}.  We'll establish the state variable, $\mathbf{z}$ to represent the quadrotor's xyz 
-center-of-mass position in the earth 
-frame $\mathbf{x}=\begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^T$; the roll, pitch, yaw angles in the earth frame, $\bm{\alpha}
-=\begin{bmatrix}\phi & \theta & \psi\end{bmatrix}^T$; the xyz linear velocities in the earth frame, $\mathbf{v}=\begin{bmatrix}v_1 & 
-v_2 & v_3\end{bmatrix}^T$; and the angular accelerations $\bm{\omega}=\begin{bmatrix}\omega_1 & \omega_2 & 
-\omega_3\end{bmatrix}^T$ in the earth roll pitch yaw directions. Our state variable then is $\mathbf{z}=\begin{bmatrix}\mathbf{x}
-&\bm{\alpha}&\mathbf{v}&\bm{\omega}\end{bmatrix}^T$. We define $\boldsymbol{\dot{z}}$ as $\begin{bmatrix} \mathbf{\dot{x}}
-&\bm{\dot{\alpha}}&\mathbf{\dot{v}}&\bm{\dot{\omega}} \end{bmatrix}^T$, with:
+\noindent \textbf{State Variable}.  Up to the state variable, development of the quadrotor equations are found in \cite{FaalD}.  We'll establish the state variable, $\mathbf{z}$, to represent the quadrotor's xyz center-of-mass position in the earth frame $\mathbf{x}=\begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^T$; the roll, pitch, yaw angles in the earth frame, $\bm{\alpha} =\begin{bmatrix}\phi & \theta & \psi\end{bmatrix}^T$; the xyz linear velocities in the earth frame, $\mathbf{v}=\begin{bmatrix}v_1 & v_2 & v_3\end{bmatrix}^T$; and the angular accelerations $\bm{\omega}=\begin{bmatrix}\omega_1 & \omega_2 & \omega_3\end{bmatrix}^T$ in the earth roll pitch yaw directions. Thus our state variable is $\mathbf{z}=\begin{bmatrix}\mathbf{x} &\bm{\alpha}&\mathbf{v}&\bm{\omega}\end{bmatrix}^T$. We define $\boldsymbol{\dot{z}}$ as $\begin{bmatrix} \mathbf{\dot{x}} &\bm{\dot{\alpha}}&\mathbf{\dot{v}}&\bm{\dot{\omega}} \end{bmatrix}^T$, with:
 
 \begin{equation}
     \mathbf{\dot{x}} =\mathbf{v}
@@ -87,7 +80,7 @@ x & y & z & \boldsymbol{0}\end{bmatrix}^T$; no velocities, accelerations, and it
 $\boldsymbol{B}$ matricies.
 
 We wish to then confirm that our system is controllable with these matricies. We create a controllability matrix $\boldsymbol{C}$, 
-which we define as $\boldsymbol{C} = \begin{bmatrix} A^0B & A^1B & A^2B & \dots & A^{n-3}B & A^{n-2}B & A^{n-1}\end{bmatrix}$ 
+which we define as $\boldsymbol{C} = \begin{bmatrix} A^0B & A^1B & A^2B & \dots & A^{n-3}B & A^{n-2}B & A^{n-1}B\end{bmatrix}$ 
 where $n$ is the size of our input, $12$. We must ensure that the combinations of our state and input matrices are linearly 
 independent to the degree that we have an independent column for each state. To do so, we check rank of the controllability matrix $
 \boldsymbol{C}$ to assure that we have rank equal to the number of states in our z vector. As expected, the rank of our derived 
@@ -128,42 +121,31 @@ and $P(t)$ is bounded by $P(0) = F(0)$. This process is repeated as we experimen
 Once we have our calculated $\boldsymbol{K}$, we define $z_d$ as the desired state of our quadrotor. If we are hovering  
 at a given point in space, it will be $z_d=\begin{bmatrix} x_{1_d} & x_{2_d} & x_{3_d} & \boldsymbol{0} 
 \end{bmatrix}^T$. When we are chasing a given target through protected airspace, we will set the desired state to 
-$z_d(t)=\begin{bmatrix} x_t(t) & \boldsymbol{0} \end{bmatrix}^T$ where $x_t(t)$ is the $x_1(t)$, $x_2(t)$, and $x_3(t)$ of the target at a given 
+$z_d(t)=\begin{bmatrix} x_t(t) & \boldsymbol{0} \end{bmatrix}^T$ where $x_t(t)$ is the given xyz position of the target at a given 
 time $t$. We then calculate the error $e(t)$ as the difference between our desired state, or $z_d - z$. We utilize the error to 
 determine the resulting inputs to our system, but we also must take note that since we assumed a linearized system around 
 hovering, we must add an additional force of $\frac{mg}{4}$ to each of our input forces. Thus $\boldsymbol{u}= \boldsymbol{K}e(t) + 
 \begin{bmatrix}\frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4}\end{bmatrix}$. 
-Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u\  \epsilon\  (0, 3)$ as that is the maximum and 
-minimum forces our motors can generate.
-We then utilize the MATLAB ODE45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $
-\boldsymbol{u}$. At each stage we determine what state of behavior we desire from our quadrotor - hover, move, and intercept - 
-and from this determine the $z_d$. We then solve for our state variable $\boldsymbol{z}$ at each time increment.
+Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u\  \epsilon\  (0, 3)$ as that is the maximum and minimum thrust our motors can generate. We then utilize the MATLAB ODE45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $\boldsymbol{u}$. At each stage we determine what state of behavior we desire from our quadrotor - hover, move, or intercept - and from this determine the $z_d$. We then solve for our state variable $\boldsymbol{z}$ at each time increment.
+
 \section*{Simulation}
 \noindent
 The foundation of simulating the controller is the solution of the system of differential equations of our original system with the added 
 gain from our LQR controller.  We have wrapped the changes in the environment into a separate function to serve as the ODE 
 function in order to incorporate time-related changes to the target path as well as $n$ and $r$ torques and forces after capture.\\
-\textbf{Quadrotor Hovering.}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]$ and 
-a desired state $z_d=[5,5,5,0,0,0,0,0,0,0,0,0] $ to demonstrate move and hover.  Feeding these into our ODE45 solver, we obtain 
+\textbf{Quadrotor Hovering.}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]^T$ and 
+a desired state $z_d=[5,5,5,\boldsymbol{0}]^T $ to demonstrate move and hover.  Feeding these into our ODE45 solver, we obtain 
 smooth movement and hovering at the given $z_d$.  (Note initial and final states as well as trajectory plotted) in Figure 1a.\\
 \textbf{Quadrotor Return to Base}. A mission objective was to return to base if the target exits the envelope before capture.  
 Figure 1b. demonstrates this performance. In this scenario the interceptor leaves the base to pursue the target, but the target exits 
 the airspace envelope before the interceptor gets close enough to capture.\\
-\textbf{Quadrotor Interception of Target}. For modeling we will input a piecewise continuous function for the target so that we can 
-include it in a single differentiation.  In earlier iterations, we coded random, continuous movements into the target which were only 
-revealed to our quadcopter each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solve time.
-For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it.   Our simulation demonstrates 
-successful interception of the target after tuning the Q matrix to de-emphasize errors 
-in the z direction (to enable smoother up/down 
+\textbf{Quadrotor Interception of Target}. For modeling we will input a continuous function for the target so that we can include it in a single differentiation.  In earlier iterations, we coded random, continuous movements into the target which were only 
+revealed to our quadcopter each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solve time. For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it. Our simulation demonstrates successful interception of the target after tuning the Q matrix to de-emphasize errors in the z direction (to enable smoother up/down 
 movement) and penalize x-y errors.  \\
 \textbf{Capture Drone and Return to Base  with Disturbances}.  For the disturbance 
 forces and torques after capture,  in the control of the ODE function we trigger a 
 change in $n$ and $r$ and re-evaluate K  to recalculate the control, $u$, term for the 
-ODE.  Mission parameters asked to reach an $||n||<=1$ (moment) and $||r||<=2$(force)
-We began by testing constant moments and forces in each direction before mixing or 
-randomizing since the system must, at a minimum, handle a constant force of the 
-required magnitude before being able to deal with a time-dependent randomized 
-force.
+ODE.  Mission parameters asked to reach an $||n||\leq1$ (moment) and $||r||\leq2$ (force). We began by testing constant moments and forces in each direction before mixing or randomizing since the system must, at a minimum, handle a constant force of the required magnitude before being able to deal with a time-dependent randomized force.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.49\columnwidth}
@@ -198,13 +180,8 @@ force.
 \end{figure}
 
 \section*{Results}
-As noted above, the LQR controller successfully handled move and hover, return to base and intercept missions.  We encountered less successful results with the disturbances after capture.\\
-\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q(4,4)$ term for roll would be impacted.  At 
-$Q(4,4)=1$ and $n=(1,0,0)$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle.  
-Because of the tumbling we hypothesized that near level flight i.e. preventing roll and pitch from exceeding $pi/4$, would benefit control 
-especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing 
-$Q(4,4)$ and $Q(5,5)$ to 10 allowed the system to converge but not at the "nest"; but rather at $[x,y,z]=[10.8,.023,.30]$.  We progressively 
-increased $n=(n_1,0,0)$ for $n_1<=2$ to attempt to meet mission parameters.  None can return to  $[x,y,z]=[0,0,0] $but some find stable solutions.  
+As noted above, the LQR controller successfully handled move and hover, return to base, and intercept missions.  We encountered less successful results with strong disturbances after capture.\\
+\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q_{(4,4)}$ term for roll would be impacted.  At $Q_{(4,4)}=1$ and $n=\begin{bmatrix}1 & 0 & 0\end{bmatrix}$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle. Due to the tumbling we hypothesized that near level flight i.e. preventing roll and pitch from exceeding $\frac{\pi}{4}$, would benefit control especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing $Q_{(4,4)}$ and $Q_{(5,5)}$ to 10 allowed the system to converge but not at the "nest"; but rather at $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}10.8 & 0.023 & 0.30\end{bmatrix}$.  We progressively increased $n=\begin{bmatrix}n_1 & 0 & 0\end{bmatrix}$ for $n_1\leq2$ to attempt to meet mission parameters.  None can return to  $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}0 & 0 & 0\end{bmatrix}$but some find stable solutions.  
 \begin{figure}[H]
 \centering
     \includegraphics[width = 1\columnwidth]{images/RollPitch.png}
@@ -229,7 +206,8 @@ r & Q(3,4/5) & $z_{1-6}$   \\
 \label{tab:STFCF1}
 \end{centering}
 \end{table}
-Convergences under forces in the $n_3$ direction benefit from strong Q(4,4) and Q(5,5) but can have far lower penalties before not converging.  Note in Table \ref{STFCF2} the closeness to the nest in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q(4,4)=Q(5,5)=145$.
+
+Convergences under forces in the $n_3$ direction benefit from strong $Q_{(4,4)}$ and $Q_{(5,5)}$ but can have far lower penalties before not converging.  Note in Table \ref{STFCF2} the closeness to the nest in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q_{(4,4)}=Q_{(5,5)}=145$.
 \begin{table}[H] %[bp]
 \begin{centering}
 \begin{tabular}{|cccc|}
@@ -247,8 +225,8 @@ $[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
 \label{tab:STFCF2}
 \end{centering}
 \end{table}
-\textbf{Moments}.  Similar to the above, we examined constant moments in each of the 3 directions.  At $n_1=.5$ (half mission parameter) we found near-convergence in the neighborhood of Q94,4)/(5,5)=950 with slight upward drift ($v_z>0$).  At $n_1=.5$ we could achieve convergence of the equations with $Q(4,4/(5,5)=1200$, but again not at the desire state.  Beyond, $n_1=.51$ it was increasingly not possible to converge on any state.  With $n_2$, the convergence horizon at $Q(4,4)=Q(5,5)=1200$ is between $.4875<n_2<.4885$.  Surprising to the team, the most sensitive was variation in $n_3$ where the convergence horizon for $Q(4,4)=Q(5,5)=Q(6,6)=1000$ is between $.0445<n_3<.045$, an order of magnitude smaller.
-Thus it is impossible to meet mission parameters with both  $||n||<=1$ and $||r||<=2$, though it may be possible with only $r<2$.  Attempting this with a random, time dependent force at $Q(4,4)/(5,5)=1400$, results in no convergence.  Though it gets close at times, the continued forces prevent velocity from converging enough for "shut down" as seen in Figure \ref{Randr}.
+
+\textbf{Moments}.  Similar to the above, we examined constant moments in each of the 3 directions.  At $n_1=.5$ (half mission parameter) we found near-convergence in the neighborhood of $Q_{(4,4)/(5,5)}=950$ with slight upward drift ($v_z>0$).  At $n_1=.5$ we could achieve convergence of the equations with $Q_{(4,4)/(5,5)}=1200$, but again not at the desire state.  Beyond, $n_1=.51$ it was increasingly not possible to converge on any state.  With $n_2$, the convergence horizon at $Q_{(4,4)}=Q_{(5,5)}=1200$ is between $.4875<n_2<.4885$.  Surprising to the team, the most sensitive was variation in $n_3$ where the convergence horizon for $Q_{(4,4)}=Q_{(5,5)}=Q_{(6,6)}=1000$ is between $.0445<n_3<.045$, an order of magnitude smaller. Thus it is impossible to meet mission parameters with both  $||n||<=1$ and $||r||<=2$, though it may be possible with only $r<2$.  Attempting this with a random, time dependent force at $Q_{(4,4)/(5,5)}=1400$, results in no convergence.  Though it gets close at times, the continued forces prevent velocity from converging enough for "shut down" as seen in Figure \ref{Randr}.
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.49\columnwidth}
