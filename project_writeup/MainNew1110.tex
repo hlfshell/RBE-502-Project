@@ -23,7 +23,7 @@
 
 
 \title{LQR Control of a Nonlinear Quadrotor System}
-\author{Keith Chester, Bob DeMont, Sean Hart}
+\author{Keith Chester, Bob DeMont & Sean Hart}
 \date{November 9th, 2021}
 
 \begin{document}
@@ -32,30 +32,29 @@
 
 \begin{multicols}{2}
 \section*{Abstract}
-The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals: simulate and control the quadrotor hover in a stable configuration, chase an interloping quadrotor in flight and intercept, and return with the captured target quadrotor with randomized disturbance force while maintaining stable flight.
+The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals: simulation and control of the quadrotor hover in a stable configuration, intercept a rogue drone's flight path, and return with the captured target quadrotor with randomized disturbance forces while maintaining stable flight.
 
 \section*{Introduction}
-The mission is defense of a designated airspace.  Our quadrotor is assigned to monitor a limited airspace, launch if an unidentified 
+The mission is the defense of a designated airspace.  Our quadrotor is assigned to guard a limited airspace, launch if an unidentified 
 UAV enters that airspace, capture the target, and return to base.  If the target leaves the airspace before being captured, our 
-quadrotor should return to base.  When captured, the target should be assumed to generate external forces and moments on our UAV.  Figure 1 of \cite{FaalP} depicts the scenario.
+quadrotor should return to base.  When captured, the target should be assumed to generate external forces and moments on our UAV.  
 \section*{Methodology}
-\textbf{General Approach}. We'll begin by generating the state space variables and defining the state space.  We'll prove 
-controllability of the system and choose a controller methodology.  Using the controller, we will simulate hover as well as move to 
-location and hover.  Finally we'll introduce external forces and moments that would be experienced simulating a target capture in the 
-problem statement.  For ease of variable passing, our quadcopter will be represented as a structure in Matlab, with full state 
-variables, A and B matrices, K gain matrix, $K_{capture}$ gain matrix (incorporating $n$ and $r$ forces and torques from the target) 
-as well as characteristics for graphing (colors etc).\\
+\textbf{General Approach}. We'll begin by generating the state space variables and defining the equations that define the state space.  We'll prove 
+controllability of the system and choose a controller methodology.  Using the controller, we will simulate hovering as well as moving to a 
+location and hover.  Finally we'll introduce external forces and moments that would be experienced by simulating a target capture in the 
+problem statement.  In order to simulate the quadcopter and flight dynamics, the design shall be coded into Matlab, using an ode solver to compute the state variables, with full state variables, A and B matrices, K gain matrix, $K_{capture}$ gain matrix (incorporating $n$ and $r$ forces and torques from the target) 
+as well as characteristics for graphing.\\
 
-\noindent \textbf{Frames and Constants}. Coordinate frames are identified for the reference/inertial frame $E={e_1, e_2, e_3}$ at the center bottom of the airspace and the 
-body frame $C={c_1, c_2, c_3}$.  All rotors are equidistant from the center of mass and in the same $c_1-c_2 $ plane as the body 
+\noindent \textbf{Frames and Constants}. Coordinate frames are identified for the reference/inertial frame $E={[e_1, e_2, e_3]}$ at the center bottom of the airspace and the 
+body frame $C={[c_1, c_2, c_3]}$.  All rotors are equidistant from the center of mass and in the same x-y plane as the body's 
 center of mass.  The external forces and moments on the system are represented by $\boldsymbol{r}$ and $\boldsymbol{n}$, where 
-$\boldsymbol{r} = r_1 c_1 + r_2 c_2 + r_3 c_3$ and $\boldsymbol{n} = n_1 c_1 + n_2 c_2 + n_3 c_3$ directly applied to the center 
+$\boldsymbol{r} = r_1 c_1 + r_2 c_2 + r_3 c_3$ and $\boldsymbol{n} = n_1 c_1 + n_2 c_2 + n_3 c_3$ are directly applied to the center 
 of mass. We are assuming that the torque of the rotor is proportionally related to the input thrust via the constant $\sigma>0$, for $
 \tau_i = \sigma u_i$. We will be utilizing $\boldsymbol{I}$ as our diagonal inertial matrix where diagonal elements  $I_x, I_y $ and 
-$I_z$ represent the mass moments of inertia about $c_1, c_2 $ and $c_3$ respectively.  For the purpose of our analysis assume simplified aerodynamic effects and ignore 
+$I_z$ represent the mass moments of inertia about $c_1, c_2 $ and $c_3$ respectively.  For the purpose of our analysis we will assume simplified aerodynamic effects and ignore 
  drag, ground effects, translational lift, blade flapping, feathering and lagging and other aerodynamic complexities. The parameters for our state are described in Table 1 of \cite{FaalP}\\
 
-\noindent \textbf{State Variable}.  Up to the state variable, development of the quadrotor equations are found in \cite{FaalD}.  We'll establish the state variable, $\mathbf{z}$ to represent the quadrotor's xyz 
+\noindent \textbf{State Variable}.Regarding to the development of the state variable equations, they are found in \cite{FaalD}. We'll establish the state variable, $\mathbf{z}$ to represent the quadrotor's xyz 
 center-of-mass position in the earth 
 frame $\mathbf{x}=\begin{bmatrix}x_1 & x_2 & x_3\end{bmatrix}^T$; the roll, pitch, yaw angles in the earth frame, $\bm{\alpha}
 =\begin{bmatrix}\phi & \theta & \psi\end{bmatrix}^T$; the xyz linear velocities in the earth frame, $\mathbf{v}=\begin{bmatrix}v_1 & 
@@ -82,11 +81,11 @@ v_2 & v_3\end{bmatrix}^T$; and the angular accelerations $\bm{\omega}=\begin{bma
 Our system is nonlinear because it is under-actuated; four actuators for six degrees of freedom. We can utilize linearization to simplify this model and approximate its behaviour for easier control. To do this, we wish to approximate our system as $\boldsymbol{\dot{z}}=\boldsymbol{A}\boldsymbol{x}+\boldsymbol{B}\boldsymbol{u}$. We derive the $\boldsymbol{A}$ matrix as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{z}$, and our $\boldsymbol{B}$ as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{u}$. 
 
 For our approximation we model the quadrotor in a stable hovering position, where a given state is $\boldsymbol{z}=\begin{bmatrix} 
-x & y & z & \boldsymbol{0}\end{bmatrix}^T$; no velocities, accelerations, and its orientation level. We assume a base output of $
+x & y & z & \boldsymbol{0}\end{bmatrix}^T$; without velocities or accelerations and its orientation level. We assume a base output of $
 \frac{mg}{4}$, or each motor outputing the necessary force of a hover. We assign these values to our derived $\boldsymbol{A}$ and 
 $\boldsymbol{B}$ matricies.
 
-We wish to then confirm that our system is controllable with these matricies. We create a controllability matrix $\boldsymbol{C}$, 
+We then confirm that our system is controllable with these matricies. We create a controllability matrix $\boldsymbol{C}$, 
 which we define as $\boldsymbol{C} = \begin{bmatrix} A^0B & A^1B & A^2B & \dots & A^{n-3}B & A^{n-2}B & A^{n-1}\end{bmatrix}$ 
 where $n$ is the size of our input, $12$. We must ensure that the combinations of our state and input matrices are linearly 
 independent to the degree that we have an independent column for each state. To do so, we check rank of the controllability matrix $
@@ -103,8 +102,8 @@ and inputs, respectively). LQR also utilizes two additional matrices- $\boldsymb
 cost such that there will be trade off between particular elements of the state and inputs in the optimization. Since we are not asked 
 to weigh the cost of using our actuators (as if we were conserving fuel), we have initially left both the  4x4 $\boldsymbol{R}$ matrix 
 and 12x12 $\boldsymbol{Q}$ matrices as identity matrices, but found through experimentation that our 
-desired performance required adjustments( to be discussed later in this paper). There is an additional matrix, $\boldsymbol{N}$, 
-which acts as a penalty to the interactions between state variables and inputs.  We simplify by not using this.
+desired performance required adjustments (to be discussed later in this paper). There is an additional matrix, $\boldsymbol{N}$, 
+which acts as a penalty to the interactions between state variables and inputs.  We simplify by omitting this matrix.
 
 LQR acts on the linearized system of the form $\dot{x} = Ax + Bu$ and calculates a cost function based on optimization.  This 
 integrates the costs of both $\boldsymbol{Q}$ and $\boldsymbol{R}$ for comparison:
@@ -135,7 +134,7 @@ hovering, we must add an additional force of $\frac{mg}{4}$ to each of our input
 \begin{bmatrix}\frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4}\end{bmatrix}$. 
 Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u\  \epsilon\  (0, 3)$ as that is the maximum and 
 minimum forces our motors can generate.
-We then utilize the MATLAB ODE45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $
+We then utilize the MATLAB's ode45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $
 \boldsymbol{u}$. At each stage we determine what state of behavior we desire from our quadrotor - hover, move, and intercept - 
 and from this determine the $z_d$. We then solve for our state variable $\boldsymbol{z}$ at each time increment.
 \section*{Simulation}
@@ -145,7 +144,7 @@ gain from our LQR controller.  We have wrapped the changes in the environment in
 function in order to incorporate time-related changes to the target path as well as n and r forces and torques after capture.\\
 \textbf{Quadrotor Hovering.}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]$ and 
 a desired state $z_d=[5,5,5,0,0,0,0,0,0,0,0,0] $ to demonstrate move and hover.  Feeding these into our ODE45 solver, we obtain 
-smooth movement and hovering at the given $z_d$.  (Note initial and final states as well as trajectory plotted) in Figure 1a.\\
+smooth movement and hovering at the given $z_d$.  (Note initial and final states as well as the trajectory plotted) in Figure 1a.\\
 \textbf{Quadrotor Return to Base}. A mission objective was to return to base if the target exits the envelope before capture.  
 Figure 1b. demonstrates this performance. In this scenario the interceptor leaves the base to pursue the target, but the target exits 
 the airspace envelope before the interceptor gets close enough to capture.\\
