@@ -32,12 +32,11 @@
 
 \begin{multicols}{2}
 \section*{Abstract}
-The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals: simulation and control of the quadrotor hover in a stable configuration, intercept a rogue drone's flight path, and return with the captured target quadrotor with randomized disturbance forces while maintaining stable flight.
+The purpose of the project is to simulate the control and stable flight of an unmanned four rotor flying vehicle known as a quadrotor.  The problem is set into three goals: simulation and control of the quadrotor hover in a stable configuration, intercept a unknown drone's flight path, and return with the captured target quadrotor with randomized disturbance forces while maintaining stable flight.
 
 \section*{Introduction}
-The mission is the defense of a designated airspace.  Our quadrotor is assigned to guard a limited airspace, launch if an unidentified 
-UAV enters that airspace, capture the target, and return to base.  If the target leaves the airspace before being captured, our 
-quadrotor should return to base.  When captured, the target should be assumed to generate external forces and moments on our UAV.
+The mission is the defense of a designated airspace.  Our quadrotor is assigned to guard a limited airspace, launch if an unidentified UAV enters that airspace, capture the target, and return to base.  If the target leaves the airspace before being captured, our quadrotor should return to base.  When captured, the target should be assumed to generate external forces and moments on our UAV.
+
 \section*{Methodology}
 \textbf{General Approach}.  We'll begin by generating the state space variables and defining the equations that define the state space.  We'll prove 
 controllability of the system and choose a controller methodology.  Using the controller, we will simulate hovering as well as moving to a 
