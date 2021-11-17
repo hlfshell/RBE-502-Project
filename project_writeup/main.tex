@@ -97,22 +97,17 @@ Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to 
 
 \section*{Simulation}
 \noindent
-The foundation of simulating the controller are the solutions of the system of differential equations of our original system with the added 
-gain from our LQR controller.  We have wrapped the changes in the environment into a separate function to serve as the ODE 
-function in order to incorporate time-related changes to the target path as well as $n$ and $r$ torques and forces after capture.\\
-\textbf{Quadrotor Hovering.}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]^T$ and 
-a desired state $z_d=[5,5,5,\boldsymbol{0}]^T $ to demonstrate move and hover.  Feeding these into our ode45 solver, we obtain 
-smooth movement and hovering at the given $z_d$.  (Noting initial and final states as well as the trajectory plotted) in Figure 1a.\\
-\textbf{Quadrotor Return to Base}. A mission objective was to return to base if the target exits the envelope before capture.  
-Figure 1b. demonstrates this performance. In this scenario the interceptor leaves the base to pursue the target, but the target exits 
-the airspace envelope before the interceptor gets close enough to capture.\\
-\textbf{Quadrotor Interception of Target}. For modeling we will input a continuous function for the target so that we can include it in a single differentiation.  In earlier iterations, we coded random, continuous movements into the target which were only 
-revealed to our quadrotor each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solved time. For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it. Our simulation demonstrates successful interception of the target after tuning the Q matrix to mitigate errors in the z direction (to enable smoother up and down 
-movement) and penalize x-y errors.  \\
-\textbf{Capture Drone and Return to Base  with Disturbances}.  For the disturbance 
-forces and torques after capture,  in the code of the ODE function we trigger a 
-change in $n$ and $r$ and re-evaluate K  to recalculate the control, $u$, term for the 
-ODE.  Mission parameters asked to reach an $||n||\leq1$ (moment) and $||r||\leq2$ (force). We began by testing constant moments and forces in each direction before mixing or randomizing since the system must, at a minimum, handle a constant force of the required magnitude before being able to deal with a time-dependent randomized force.
+The foundation of simulating the controller is the solution of the system of differential equations of our original system with the added gain from our LQR controller.  We have wrapped the changes in the environment into a separate function to serve as the ODE 
+function in order to incorporate time-related changes to the target path as well as $n$ and $r$ torques and forces after capture.
+
+\noindent\textbf{Quadrotor Hovering}. To demonstrate successful control of our quadrotor, we establish an initial state of $z=[\mathbf{0}]^T$ and a desired state $z_d=[5,5,5,\boldsymbol{0}]^T $ to demonstrate move and hover.  Feeding these into our ODE45 solver, we obtain smooth movement and hovering at the given $z_d$. Note initial and final states as well as the trajectory plotted in Figure 1a.
+
+\noindent\textbf{Quadrotor Return to Base}. A mission objective is to return to base if the target exits the envelope before capture. Figure 1b. demonstrates this performance. In this scenario the interceptor leaves the base to pursue the target, but the target exits the airspace envelope before the interceptor gets close enough to capture.
+
+\noindent\textbf{Quadrotor Interception of Target}. For modeling the target UAV's state $z_t=\begin{bmatrix}\boldsymbol{x_t}(t) & \boldsymbol{0}\end{bmatrix}^T$, where $\boldsymbol{x_t}(t)$ is a continuous function for the target's given $x$, $y$, and $z$ at time $t$. While its path is unknown to the inteceptor quadrotor's control system, we utilize this function to generate a realistic trajectory for the target UAV. It is assumed that the target is intercepted if the quadrotor is within a distance of 0.3 meters of the target. Our simulation demonstrates successful interception of the target after tuning the Q matrix to mitigate errors in the z direction (to enable smoother up and down movement) and penalize x-y errors.
+
+\noindent\textbf{Capture and Return to Base}.  To model the disturbance forces and torques post capture, we trigger a change in $n$ and $r$ within the code of the ODE function and re-evaluate K to recalculate the control term $u$ for the ODE. Mission parameters asked to reach an $||n||\leq1$ (moment) and $||r||\leq2$ (force). We began by testing constant moments and forces in each direction before mixing or randomizing since the system must, at a minimum, handle a constant force of the required magnitude before being able to deal with a time-dependent randomized force.
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.49\columnwidth}
