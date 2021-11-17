@@ -59,21 +59,16 @@ The mission is the defense of a designated airspace.  Our quadrotor is assigned 
 
 \noindent where $\mathbf{R_{C/E}}$ is defined in the problem statement as the Euler rotation matrix from quadrotor frame $C$ to earth frame $E$ and $\mathbf{T}^{-1}$, also defined in the problem statement, relates the angular rate of change of the Euler angles based on the angular velocity of the quadrotor.
 
-Our system is nonlinear because it is under-actuated; four actuators for six degrees of freedom. We can utilize linearization to simplify this model and approximate its behaviour for easier control. To do this,  approximate our system as $\boldsymbol{\dot{z}}=\boldsymbol{A}\boldsymbol{x}+\boldsymbol{B}\boldsymbol{u}$. We derive the $\boldsymbol{A}$ matrix as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{z}$, and our $\boldsymbol{B}$ as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{u}$. 
+Our system is nonlinear because it is under-actuated; four actuators for six degrees of freedom. We can utilize linearization to simplify this model and approximate its behaviour for easier control. To do this, we approximate our system as $\boldsymbol{\dot{z}}=\boldsymbol{A}\boldsymbol{z}+\boldsymbol{B}\boldsymbol{u}$. We derive the $\boldsymbol{A}$ matrix as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{z}$, and our $\boldsymbol{B}$ as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{u}$. 
 
 For our approximation we model the quadrotor in a stable hovering position, where a given state is $\boldsymbol{z}=\begin{bmatrix} 
-x & y & z & \boldsymbol{0}\end{bmatrix}^T$; no velocities, accelerations, and its orientation level. We assume a base output of $
-\frac{mg}{4}$, or each motor outputing the necessary force of a hover. We assign these values to our derived $\boldsymbol{A}$ and 
-$\boldsymbol{B}$ matricies.
+x & y & z & \boldsymbol{0}\end{bmatrix}^T$; no velocities, accelerations, and its orientation level. We assume a base output of $\frac{mg}{4}$, or each motor outputing the necessary force of a hover. We assign these values to our derived $\boldsymbol{A}$ and $\boldsymbol{B}$ matricies.
 
 We then confirm that our system is controllable with these matricies. We create a controllability matrix $\boldsymbol{C}$, 
 which we define as $\boldsymbol{C} = \begin{bmatrix} A^0B & A^1B & A^2B & \dots & A^{n-3}B & A^{n-2}B & A^{n-1}B\end{bmatrix}$ 
-where $n$ is the size of our input, $12$. We must ensure that the combinations of our state and input matrices are linearly 
-independent to the degree that we have an independent column for each state. To do so, we check rank of the controllability matrix $
-\boldsymbol{C}$ to assure that we have rank equal to the number of states in our z vector. As expected, the rank of our derived 
-controllabiltiy matrix is indeed $12$.
+where $n$ is the size of our input, $12$. We check rank of the controllability matrix $\boldsymbol{C}$ to assure that we have rank equal to the number of states in our z vector. As expected, the rank of our derived controllability matrix is indeed $12$.
 
-We can utilize these to derive our $\boldsymbol{K}$ matrix to create a Linear-Quadratic Regulator (LQR) controller.
+We then utilize $\boldsymbol{A}$ and $\boldsymbol{B}$ to derive our $\boldsymbol{K}$ matrix to create a Linear-Quadratic Regulator (LQR) controller.
 
 \section*{LQR Controller}
 We selected the Linear-Quadratic Regulator (LQR) approach as an optimal control technique for generating the gain matrix, $
