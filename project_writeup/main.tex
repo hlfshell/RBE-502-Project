@@ -57,7 +57,7 @@ The mission is the defense of a designated airspace.  Our quadrotor is assigned 
     \bm{\dot{\omega}} &=I^{-1}((u_2-u_4)lc_1+(u_3-u_1)lc_2 \nonumber\\ &+(u_1-u_2+u_3-u_4)\sigma c_3+n-\omega \times I \omega)
 \end{align}
 
-\noindent ...where $\mathbf{R_{C/E}}$ is defined in the problem statement as the Euler rotation matrix from quadrotor frame $C$ to earth frame $E$ and $\mathbf{T}^{-1}$, also defined in the problem statement, relates the angular rate of change of the Euler angles based on the angular velocity of the quadrotor.
+\noindent where $\mathbf{R_{C/E}}$ is defined in the problem statement as the Euler rotation matrix from quadrotor frame $C$ to earth frame $E$ and $\mathbf{T}^{-1}$, also defined in the problem statement, relates the angular rate of change of the Euler angles based on the angular velocity of the quadrotor.
 
 Our system is nonlinear because it is under-actuated; four actuators for six degrees of freedom. We can utilize linearization to simplify this model and approximate its behaviour for easier control. To do this,  approximate our system as $\boldsymbol{\dot{z}}=\boldsymbol{A}\boldsymbol{x}+\boldsymbol{B}\boldsymbol{u}$. We derive the $\boldsymbol{A}$ matrix as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{z}$, and our $\boldsymbol{B}$ as the Jacobian of our $\boldsymbol{\dot{z}}$ by $\boldsymbol{u}$. 
 
