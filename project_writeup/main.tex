@@ -149,8 +149,8 @@ As noted above, the LQR controller successfully handled move and hover, return t
 \begin{figure}[H]
 \centering
     \includegraphics[width = 1\columnwidth]{images/RollPitch.png}
-     \label{fig:horizon}
-     \caption{Q as Function of n in x}
+    \caption{Q as Function of n in x}
+    \label{fig:horizon}
 \end{figure}
 
 \noindent Figure \ref{fig:horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $r=(-r_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $r_2$ direction, result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.
@@ -209,8 +209,8 @@ $[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
      \vspace{-5mm}
       \caption{Velocities}
  \end{subfigure}\\
- \bigskip
-\begin{subfigure}[b]{1.0\columnwidth}
+ 
+\begin{subfigure}[b]{0.84\columnwidth}
     \centering
     \includegraphics[width = 1\textwidth]{images/InterceptRandom.png}
      \label{fig:RandTraj}
@@ -228,6 +228,7 @@ The approach utilized within this paper successfully navigates the simpler aspec
 \noindent Further research would tune the $\boldsymbol{Q}$ and $\boldsymbol{R}$ matrices more closely.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}. We could also enhance the process to store target position to estimate the target velocity and acceleration vectors to anticipate next target position. This could improve time to intercept and allow use of $\boldsymbol{Q}$ weightings for velocity components. Similarly, attempting to predict target trajectory allows setting the $z_d$ in our control function to a likely future state of the target, resulting in a quicker intercept. More advanced analysis could include utilizing the $\boldsymbol{R}$ matrix to penalize usage of motors to minimize power expenditure and maximize battery life and thus range of coverage and mission lifespan.
 
 \noindent After this experiment, these authors would recommend not utilizing linearized systems when dealing with expected external and unpredictable perturbances.
+
 \label{References}
 \bibliographystyle{abbrv}
 \begin{thebibliography}{10}
@@ -240,18 +241,18 @@ arXiv:2005.09858v1.
 Faal, Siamak. Project Statement.  Class notes for RBE 502. Spring 2021.
 \bibitem{FaalD}
 Faal, Siamak. Notes on Control of Quadrotors. Class notes for RBE 502. March 3, 2021.
-\bibitem{AHM}
-Faraz Ahmad, Pushpendra Kumar, Anamika Bhandari, Pravin P. Patil.
-Simulation of the Quadrotor Dynamics with LQR based Control.
-Materials Today: Proceedings,Volume 24, Part 2, 2020, Pages 326-332,
-ISSN 2214-7853.
-https://doi.org/10.1016/j.matpr.2020.04.282.
-\bibitem{OKY}
-Okyere, E., Bousbaine, A., Poyi, G. T., Joseph, A. K., and Andrade.,
-J. M. (2018) ‘LQR controller design for quad-rotor helicopters’,
-The 9th International Conference on Power Electronics, Machines
-and Drives. The Arena and Convention Centre, Liverpool, 17-19
-April. London: The Institute of Engineering and Technology, pp.1-7
+% \bibitem{AHM}
+% Faraz Ahmad, Pushpendra Kumar, Anamika Bhandari, Pravin P. Patil.
+% Simulation of the Quadrotor Dynamics with LQR based Control.
+% Materials Today: Proceedings,Volume 24, Part 2, 2020, Pages 326-332,
+% ISSN 2214-7853.
+% https://doi.org/10.1016/j.matpr.2020.04.282.
+% \bibitem{OKY}
+% Okyere, E., Bousbaine, A., Poyi, G. T., Joseph, A. K., and Andrade.,
+% J. M. (2018) ‘LQR controller design for quad-rotor helicopters’,
+% The 9th International Conference on Power Electronics, Machines
+% and Drives. The Arena and Convention Centre, Liverpool, 17-19
+% April. London: The Institute of Engineering and Technology, pp.1-7
 \bibitem{mur}
 Murray, Richard M. Optimization Based Control.  California Institute of Technology. January 4th, 2010.
 
