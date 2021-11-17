@@ -68,20 +68,10 @@ We then confirm that our system is controllable with these matricies. We create 
 which we define as $\boldsymbol{C} = \begin{bmatrix} A^0B & A^1B & A^2B & \dots & A^{n-3}B & A^{n-2}B & A^{n-1}B\end{bmatrix}$ 
 where $n$ is the size of our input, $12$. We check rank of the controllability matrix $\boldsymbol{C}$ to assure that we have rank equal to the number of states in our z vector. As expected, the rank of our derived controllability matrix is indeed $12$.
 
-We then utilize $\boldsymbol{A}$ and $\boldsymbol{B}$ to derive our $\boldsymbol{K}$ matrix to create a Linear-Quadratic Regulator (LQR) controller.
-
 \section*{LQR Controller}
-We selected the Linear-Quadratic Regulator (LQR) approach as an optimal control technique for generating the gain matrix, $
-\boldsymbol{K}$.  LQR operates on our linearized system, utilizing both $\boldsymbol{A}$ and $\boldsymbol{B}$ matricies (states 
-and inputs, respectively). LQR also utilizes two additional matrices- $\boldsymbol{Q}$ and $\boldsymbol{R}$, which correspond to $
-\boldsymbol{A}$ and $\boldsymbol{B}$, respectively. $\boldsymbol{Q}$'s and $\boldsymbol{R}$'s purpose are to impose a weighted 
-cost such that there will be trade off between particular elements of the state and inputs in the optimization. Since we are not asked 
-to weigh the cost of using our actuators (as if we were conserving fuel), we have initially left both the  4x4 $\boldsymbol{R}$ matrix 
-and 12x12 $\boldsymbol{Q}$ matrices as identity matrices, but found through experimentation that our 
-desired performance required adjustments( to be discussed later in this paper). There is an additional matrix, $\boldsymbol{N}$, 
-which acts as a penalty to the interactions between state variables and inputs.  We simplify by omitting this matrix.
+We selected the Linear-Quadratic Regulator (LQR) approach as an optimal control technique for generating the gain matrix, $\boldsymbol{K}$.  LQR operates on our linearized system, utilizing both $\boldsymbol{A}$ and $\boldsymbol{B}$ matricies (states and inputs, respectively). LQR also utilizes two additional matrices - $\boldsymbol{Q}$ and $\boldsymbol{R}$, which correspond to $\boldsymbol{A}$ and $\boldsymbol{B}$, respectively. $\boldsymbol{Q}$'s and $\boldsymbol{R}$'s purpose are to impose a weighted cost such that there will be a trade off between particular elements of the state and inputs in the optimization. Since we are not asked to weigh the cost of using our actuators (as if we were conserving fuel), we have set the 4x4 $\boldsymbol{R}$ matrix as an identity matrix. Our 12x12 $\boldsymbol{Q}$ matrix starts as an identity matrix, but we found through experimentation that our desired performance required adjustments we discuss later. There is an additional matrix, $\boldsymbol{N}$, which acts as a penalty to the interactions between state variables and inputs.  We simplify by leaving $\boldsymbol{N}$ as an identiy matrix.
 
-LQR acts on the linearized system of the form $\dot{x} = Ax + Bu$ and calculates a cost function based on optimization.  This 
+LQR acts on the linearized system of the form $\dot{x} = \boldsymbol{A}x + \boldsymbol{B}u$ and calculates a cost function based on optimization.  This 
 integrates the costs of both $\boldsymbol{Q}$ and $\boldsymbol{R}$ for comparison:
 \begin{equation}
 J =x_0^TF(0)x(t_0) +  \int_{t_0}^{t_f} x^TQx+u^TRu +2x^TNu\,dt 
@@ -92,7 +82,7 @@ The control input u that minimizes this cost function is $u= -Kx$ with the K val
 K = R^{-1}(B^TP(t) + N^T)
 \end{equation}
 \noindent
-Where P is created by solving Ricatti's continuous time differential equation:
+where P is created by solving Ricatti's continuous time differential equation:
 \begin{align}
 A^TP(t) + P(t)A - (P(t)B + N)R^{-1}(B^TP(t) + N^T) \nonumber\\+ Q = \dot{P}(t)
 \end{align}
@@ -101,14 +91,9 @@ and $P(t)$ is bounded by $P(0) = F(0)$. This process is repeated as we experimen
 \boldsymbol{Q}$ matrix.
 
 Once we have our calculated $\boldsymbol{K}$, we define $z_d$ as the desired state of our quadrotor. If we are hovering  
-at a given point in space, it will be $z_d=\begin{bmatrix} x_{1_d} & x_{2_d} & x_{3_d} & \boldsymbol{0} 
-\end{bmatrix}^T$. When we are chasing a given target through protected airspace, we will set the desired state to 
-$z_d(t)=\begin{bmatrix} x_t(t) & \boldsymbol{0} \end{bmatrix}^T$ where $x_t(t)$ is the given xyz position of the target at a given 
-time $t$. We then calculate the error $e(t)$ as the difference between our desired state, or $z_d - z$. We utilize the error to 
-determine the resulting inputs to our system, but we also must take note that since we assumed a linearized system around 
-hovering, we must add an additional force of $\frac{mg}{4}$ to each of our input forces. Thus $\boldsymbol{u}= \boldsymbol{K}e(t) + 
-\begin{bmatrix}\frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4}\end{bmatrix}$. 
-Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u\  \epsilon\  (0, 3)$ as that is the maximum and minimum thrust our motors can generate. We then utilize the MATLAB ode45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $\boldsymbol{u}$. At each stage we determine what state of behavior we desire from our quadrotor - hover, move, or intercept - and from this determine the $z_d$. We then solve for our state variable $\boldsymbol{z}$ at each time increment.
+at a given point in space, it will be $z_d=\begin{bmatrix} x_{1_d} & x_{2_d} & x_{3_d} & \boldsymbol{0} \end{bmatrix}^T$. When we are chasing a given target through protected airspace, we will set the desired state to $z_d(t)=\begin{bmatrix} x_t(t) & \boldsymbol{0} \end{bmatrix}^T$ where $x_t(t)$ is the given xyz position of the target at a given time $t$. We then calculate the error $e(t)$ as the difference between our desired state, or $z_d - z$. We utilize the error to determine the resulting inputs to our system, but we also must take note that since we assumed a linearized system around hovering, we must add an additional force of $\frac{mg}{4}$ to each of our input forces. Thus $\boldsymbol{u}= \boldsymbol{K}e(t) + \begin{bmatrix}\frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4} & \frac{mg}{4}\end{bmatrix}^T$. 
+
+Once we have calculated our $\boldsymbol{u}$, we limit the resulting outputs to to $u\  \epsilon\  (0, 3)$ as that is the range of thrust our rotors can generate. We then utilize the MATLAB ODE45 solver, with our previously derived $\boldsymbol{\dot{z}}$ and calculated $\boldsymbol{u}$. At each stage we determine what state of behavior we desire from our quadrotor - hover, move, or intercept - and from this determine the $z_d$. We then solve for our state variable $\boldsymbol{z}$ at each time increment.
 
 \section*{Simulation}
 \noindent
