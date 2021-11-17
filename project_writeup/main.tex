@@ -144,7 +144,7 @@ function in order to incorporate time-related changes to the target path as well
 \section*{Results}
 As noted above, the LQR controller successfully handled move and hover, return to base, and intercept missions.  We encountered less successful results with strong disturbances after capture.
 
-\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q_{(4,4)}$ term for roll would be impacted.  At $Q_{(4,4)}=1$ and $n=\begin{bmatrix}1 & 0 & 0\end{bmatrix}$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle. Due to the tumbling we hypothesized that near level flight, i.e. preventing roll and pitch from exceeding $\frac{\pi}{4}$, would benefit control especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing $Q_{(4,4)}$ and $Q_{(5,5)}$ to 10 allowed the system to converge but not at our expected home; but rather at $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}10.8 & 0.023 & 0.30\end{bmatrix}$.  We progressively increased $n=\begin{bmatrix}n_1 & 0 & 0\end{bmatrix}$ for $n_1\leq2$ to attempt to meet mission parameters.  None can return to  $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}0 & 0 & 0\end{bmatrix}$ but some find stable solutions.  
+\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q_{(4,4)}$ term for roll would be impacted.  At $Q_{(4,4)}=1$ and $r=\begin{bmatrix}1 & 0 & 0\end{bmatrix}$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle. Due to the tumbling we hypothesized that near level flight, i.e. preventing roll and pitch from exceeding $\frac{\pi}{4}$, would benefit control especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing $Q_{(4,4)}$ and $Q_{(5,5)}$ to 10 allowed the system to converge but not at our expected home; but rather at $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}10.8 & 0.023 & 0.30\end{bmatrix}$.  We progressively increased $r=\begin{bmatrix}r_1 & 0 & 0\end{bmatrix}$ for $r_1\leq2$ to attempt to meet mission parameters.  None can return to  $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}0 & 0 & 0\end{bmatrix}$ but some find stable solutions.  
 
 \begin{figure}[H]
 \centering
@@ -153,7 +153,7 @@ As noted above, the LQR controller successfully handled move and hover, return t
      \caption{Q as Function of n in x}
 \end{figure}
 
-\noindent Figure \ref{fig:horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $n=(-n_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $n_2$ direction, result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.
+\noindent Figure \ref{fig:horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $r=(-r_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $r_2$ direction, result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.
 
 \begin{table}[H] %[bp]
 \begin{centering}
@@ -172,10 +172,10 @@ r & $Q_{(3,4/5)}$ & $z_{1-6}$   \\
 \end{centering}
 \end{table}
 
-\noindent Convergences under forces in the $n_3$ direction benefit from strong $Q_{(4,4)}$ and $Q_{(5,5)}$ but can have far lower penalties before not converging.  Note in Table \ref{tab:STFCF2} the proximity to home in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q_{(4,4)}=Q_{(5,5)}=145$.
+\noindent Convergences under forces in the $r_3$ direction benefit from strong $Q_{(4,4)}$ and $Q_{(5,5)}$ but can have far lower penalties before not converging.  Note in Table \ref{tab:STFCF2} the proximity to home in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q_{(4,4)}=Q_{(5,5)}=145$.
 \begin{table}[H] %[bp]
 \begin{centering}
-\begin{tabular}{|cccc|}
+\begin{tabular}{|ccc|}
 \hline
 r & $Q_{(3,4/5)}$ & $z_{1-6}$   \\
 \hline
@@ -191,7 +191,8 @@ $[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
 \end{centering}
 \end{table}
 
-\textbf{Moments}.  Similar to the above, we examined constant moments in each of the 3 directions.  At $n_1=.5$ (half mission parameter) we found near-convergence in the neighborhood of $Q_{(4,4)/(5,5)}=950$ with slight upward drift ($v_z>0$).  At $n_1=.5$ we could achieve convergence of the equations with $Q_{(4,4)/(5,5)}=1200$, but again not at the desire state.  Beyond, $n_1=.51$ it was increasingly not possible to converge on any state.  With $n_2$, the convergence horizon at $Q_{(4,4)}=Q_{(5,5)}=1200$ is between $.4875<n_2<.4885$.  Surprising to the team, the most sensitive was variation in $n_3$ where the convergence horizon for $Q_{(4,4)}=Q_{(5,5)}=Q_{(6,6)}=1000$ is between $.0445<n_3<.045$, an order of magnitude smaller. Thus it is impossible to meet mission parameters with both  $||n||<=1$ and $||r||<=2$, though it may be possible with only $r<2$.  Attempting this with a random, time dependent force at $Q_{(4,4)/(5,5)}=1400$, results in no convergence.  Though it gets close at times, the continued forces prevent velocity from converging enough for "shut down" as seen in Figure \ref{Randr}.
+\noindent\textbf{Moments}.  Similar to the above, we examined constant moments in each of the 3 directions.  At $n_1=.5$ (half mission parameter) we found near-convergence in the neighborhood of $Q_{(4,4)/(5,5)}=950$ with slight upward drift ($v_z>0$).  At $n_1=.5$ we could achieve convergence of the equations with $Q_{(4,4)/(5,5)}=1200$, but again not at the desired state.  Beyond, $n_1=.51$ it was increasingly not possible to converge on any state.  With $n_2$, the convergence horizon at $Q_{(4,4)}=Q_{(5,5)}=1200$ is between $.4875<n_2<.4885$. Surprising to the team, the most sensitive was variation in $n_3$ where the convergence horizon for $Q_{(4,4)}=Q_{(5,5)}=Q_{(6,6)}=1000$ is between $.0445<n_3<.045$, an order of magnitude smaller. Thus it is impossible to meet mission parameters with both  $||n||\leq1$ and $||r||\leq2$, though it may be possible with only $r<2$.  Attempting this with a random, time dependent force at $Q_{(4,4)/(5,5)}=1400$, results in no convergence.  Though it gets close at times, the continued forces prevent velocity from converging enough for "shut down" as seen in Figure \ref{fig:Randr}.
+
 \begin{figure}[H]
 \centering
 \begin{subfigure}[b]{0.49\columnwidth}
@@ -219,6 +220,7 @@ $[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
     \caption{Random r Performance Tests}
      \label{fig:Randr}
 \end{figure}
+
 \section*{Discussion}
 Further research would tune the Q and R matrices more closely.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}.  We could also enhance the process to store target position to estimate the target velocity vector to anticipate next target position.  This could improve time to intercept and allow use of Q weightings for velocity components. More advanced analysis could include power analysis to improve battery life of the quadrotor to extend mission life.  
 \label{References}
