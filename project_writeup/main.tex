@@ -38,11 +38,8 @@ The purpose of the project is to simulate the control and stable flight of an un
 The mission is the defense of a designated airspace.  Our quadrotor is assigned to guard a limited airspace, launch if an unidentified UAV enters that airspace, capture the target, and return to base.  If the target leaves the airspace before being captured, our quadrotor should return to base.  When captured, the target should be assumed to generate external forces and moments on our UAV.
 
 \section*{Methodology}
-\textbf{General Approach}.  We'll begin by generating the state space variables and defining the equations that define the state space.  We'll prove 
-controllability of the system and choose a controller methodology.  Using the controller, we will simulate hovering as well as moving to a 
-location and hover.  Finally we'll introduce external forces and moments that would be experienced by simulating a target capture in the 
-problem statement.  In order to simulate the quadcopter and flight dynamics, the design shall be coded into Matlab, using an ode solver to compute the state variables, with full state variables, A and B matrices, K gain matrix, $K_{capture}$ gain matrix (incorporating $n$ and $r$ forces and torques from the target) 
-as well as characteristics for graphing.\\
+\textbf{General Approach}.  We'll begin by generating the state space variables and defining the equations that define the state space.  We'll prove controllability of the system and choose a controller methodology.  Using the controller, we will simulate hovering as well as moving to a location and hovering. Finally we'll introduce external forces and moments that would be experienced by simulating a target capture in the problem statement. In order to simulate the quadrotor and its flight dynamics, the design will be coded into MATLAB, using an ODE solver to compute the state variables, with full state variables, A and B matrices, K gain matrix, $K_{capture}$ gain matrix (incorporating $n$ and $r$ forces and torques from the target), as well as characteristics for graphing.\\
+
 \noindent \textbf{Frames and Constants}.  Coordinate frames are identified for the reference/inertial frame $E={[e_1, e_2, e_3]}$ at the center bottom of the airspace and the 
 body frame $C={[c_1, c_2, c_3]}$.  All rotors are equidistant from the center of mass and in the same x-y plane as the body's 
 center of mass.  The external forces and moments on the system are represented by $\boldsymbol{r}$ and $\boldsymbol{n}$, where 
@@ -137,7 +134,7 @@ smooth movement and hovering at the given $z_d$.  (Noting initial and final stat
 Figure 1b. demonstrates this performance. In this scenario the interceptor leaves the base to pursue the target, but the target exits 
 the airspace envelope before the interceptor gets close enough to capture.\\
 \textbf{Quadrotor Interception of Target}. For modeling we will input a continuous function for the target so that we can include it in a single differentiation.  In earlier iterations, we coded random, continuous movements into the target which were only 
-revealed to our quadcopter each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solved time. For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it. Our simulation demonstrates successful interception of the target after tuning the Q matrix to mitigate errors in the z direction (to enable smoother up and down 
+revealed to our quadrotor each second in a loop.  We resolved the ODE for new $z_d$ in that loop and were readily able to converge, so we believe the known "unknown" target trajectory to be an allowable simplification for solved time. For interception, it is assumed that the target is intercepted if we get within a distance of 0.3 meters of it. Our simulation demonstrates successful interception of the target after tuning the Q matrix to mitigate errors in the z direction (to enable smoother up and down 
 movement) and penalize x-y errors.  \\
 \textbf{Capture Drone and Return to Base  with Disturbances}.  For the disturbance 
 forces and torques after capture,  in the code of the ODE function we trigger a 
