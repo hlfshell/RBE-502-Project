@@ -221,8 +221,13 @@ $[0,0,2]$&[1,145]&[1.8, 0.5, 11.9, 0.2,-0.1,0.06]\\
      \label{fig:Randr}
 \end{figure}
 
-\section*{Discussion}
-Further research would tune the Q and R matrices more closely.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}.  We could also enhance the process to store target position to estimate the target velocity vector to anticipate next target position.  This could improve time to intercept and allow use of Q weightings for velocity components. More advanced analysis could include power analysis to improve battery life of the quadrotor to extend mission life.  
+\section*{Conclusions}
+
+The approach utilized within this paper successfully navigates the simpler aspects of the assigned mission - move and hover at a desired location, and intercept an intruding target UAV. It fails, however, to deal with the resulting forces of the target UAV resisting capture. Since the behavior of the quadrotor fails catastrophically when its $\phi$ or $\theta$ increases to an angle above $\frac{\pi}{4}$, this suggests that it is due to our dependence upon linearization around a simplified system at hovering. While LQR allowed us to easily specify multiple weighting pairs of $\boldsymbol{Q}$ and $\boldsymbol{R}$ matricies for behaving differently in various states, it ultimately could not be adjusted to prevent reaching a catastrophic failure state.
+
+\noindent Further research would tune the $\boldsymbol{Q}$ and $\boldsymbol{R}$ matrices more closely.  Various external research suggests simply trial and error while others suggest optimization methods. A common method is to weight by the inverse of the maximum allowable error squared \cite{mur}. We could also enhance the process to store target position to estimate the target velocity and acceleration vectors to anticipate next target position. This could improve time to intercept and allow use of $\boldsymbol{Q}$ weightings for velocity components. Similarly, attempting to predict target trajectory allows setting the $z_d$ in our control function to a likely future state of the target, resulting in a quicker intercept. More advanced analysis could include utilizing the $\boldsymbol{R}$ matrix to penalize usage of motors to minimize power expenditure and maximize battery life and thus range of coverage and mission lifespan.
+
+\noindent After this experiment, these authors would recommend not utilizing linearized systems when dealing with expected external and unpredictable perturbances.
 \label{References}
 \bibliographystyle{abbrv}
 \begin{thebibliography}{10}
