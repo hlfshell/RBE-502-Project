@@ -142,19 +142,22 @@ function in order to incorporate time-related changes to the target path as well
 \end{figure}
 
 \section*{Results}
-As noted above, the LQR controller successfully handled move and hover, return to base, and intercept missions.  We encountered less successful results with strong disturbances after capture.\\
-\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q_{(4,4)}$ term for roll would be impacted.  At $Q_{(4,4)}=1$ and $n=\begin{bmatrix}1 & 0 & 0\end{bmatrix}$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle. Due to the tumbling we hypothesized that near level flight i.e. preventing roll and pitch from exceeding $\frac{\pi}{4}$, would benefit control especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing $Q_{(4,4)}$ and $Q_{(5,5)}$ to 10 allowed the system to converge but not at the "nest"; but rather at $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}10.8 & 0.023 & 0.30\end{bmatrix}$.  We progressively increased $n=\begin{bmatrix}n_1 & 0 & 0\end{bmatrix}$ for $n_1\leq2$ to attempt to meet mission parameters.  None can return to  $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}0 & 0 & 0\end{bmatrix}$but some find stable solutions.  
+As noted above, the LQR controller successfully handled move and hover, return to base, and intercept missions.  We encountered less successful results with strong disturbances after capture.
+
+\textbf{Forces}.  To explore, we began simulating constant force in the $c_1$ direction to understand how our $Q_{(4,4)}$ term for roll would be impacted.  At $Q_{(4,4)}=1$ and $n=\begin{bmatrix}1 & 0 & 0\end{bmatrix}$ the system did not converge on an equilibrium and began a catastrophic tumbling beginning with pitch angle. Due to the tumbling we hypothesized that near level flight, i.e. preventing roll and pitch from exceeding $\frac{\pi}{4}$, would benefit control especially since the forces are acting in the $c$ frame which causes an outsize effect in $e$.  Compensating for the tumbling by increasing $Q_{(4,4)}$ and $Q_{(5,5)}$ to 10 allowed the system to converge but not at our expected home; but rather at $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}10.8 & 0.023 & 0.30\end{bmatrix}$.  We progressively increased $n=\begin{bmatrix}n_1 & 0 & 0\end{bmatrix}$ for $n_1\leq2$ to attempt to meet mission parameters.  None can return to  $\begin{bmatrix}x & y & z\end{bmatrix}=\begin{bmatrix}0 & 0 & 0\end{bmatrix}$ but some find stable solutions.  
+
 \begin{figure}[H]
 \centering
     \includegraphics[width = 1\columnwidth]{images/RollPitch.png}
-     \label{fig:Horizon}
+     \label{fig:horizon}
      \caption{Q as Function of n in x}
 \end{figure}
-Figure \ref{Horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $n=(-n_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $n_2$ direction result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.\\
+
+\noindent Figure \ref{fig:horizon} displays the results as well as approximates a control horizon (between the two lines) below which the system will not converge and above which it will.  Solutions close to the horizon exhibit often erratic flight prior to converging.  In the $n=(-n_1,0,0)$, the results were similar with convergence states in the opposite $x$ direction (as we would expect).  Forces, both positive and negative in the $n_2$ direction, result in similar covergence states with the $x$ and $y$ positions transposed as seen in Table \ref{tab:STFCF1}.
 
 \begin{table}[H] %[bp]
 \begin{centering}
-\begin{tabular}{|cccc|}
+\begin{tabular}{|ccc|}
 \hline
 r & $Q_{(3,4/5)}$ & $z_{1-6}$   \\
 \hline
@@ -169,7 +172,7 @@ r & $Q_{(3,4/5)}$ & $z_{1-6}$   \\
 \end{centering}
 \end{table}
 
-Convergences under forces in the $n_3$ direction benefit from strong $Q_{(4,4)}$ and $Q_{(5,5)}$ but can have far lower penalties before not converging.  Note in Table \ref{STFCF2} the closeness to the nest in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q_{(4,4)}=Q_{(5,5)}=145$.
+\noindent Convergences under forces in the $n_3$ direction benefit from strong $Q_{(4,4)}$ and $Q_{(5,5)}$ but can have far lower penalties before not converging.  Note in Table \ref{tab:STFCF2} the proximity to home in $x$ and $y$ in the early scenarios (still $z$=2.8), while the state diverges at $Q_{(4,4)}=Q_{(5,5)}=145$.
 \begin{table}[H] %[bp]
 \begin{centering}
 \begin{tabular}{|cccc|}
